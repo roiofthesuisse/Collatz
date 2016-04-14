@@ -8,7 +8,9 @@ public class Main {
 	public static int tailleChiffres = (int) Math.floor(Math.log(Math.pow(2, xmax))/Math.log(10));
 	static int len = 16;
 	static boolean AFFICHER_FANTOMES = true;
-	static boolean N_AFFICHER_QUE_LES_BRANCHES_AINEES = true;
+	static boolean AFFICHER_FANTOMITUDE = true;
+	static boolean N_AFFICHER_QUE_LES_BRANCHES_AINEES = false;
+	static boolean AFFICHER_OBLICITE = true;
 	
 	public static void main(String[]args){
 		//creation de l'arbre
@@ -87,11 +89,19 @@ public class Main {
 							if(cell.length()>1){
 								cell=cell+",";
 							}
+							
+							if(AFFICHER_FANTOMITUDE){
+								cell = cell+(n.fantome?"F":"R");
+							}
 							String zeros = "";
 							for(int k=(""+n.valeur).length(); k<tailleChiffres; k++){
 								zeros += "0";
 							}
 							cell = cell+zeros+n.valeur;
+							if(AFFICHER_OBLICITE){
+								cell = cell+"_"+n.oblicite();
+							}
+							
 						}
 					}
 				}
