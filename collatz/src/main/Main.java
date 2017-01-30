@@ -7,13 +7,13 @@ public class Main {
 	static int ymax = xmax/2+2;
 	public static int tailleChiffres = (int) Math.floor(Math.log(Math.pow(2, xmax))/Math.log(10));
 	static int len = 16;
-	static boolean AFFICHER_FANTOMES = true;
-	static boolean AFFICHER_FANTOMITUDE = true;
+	static boolean AFFICHER_FANTOMES = false;
+	static boolean AFFICHER_FANTOMITUDE = false;
 	static boolean N_AFFICHER_QUE_LES_BRANCHES_AINEES = false;
-	static boolean AFFICHER_OBLICITE = true;
+	static boolean AFFICHER_OBLICITE = false;
 	
 	public static void main(String[]args){
-		//creation de l'arbre
+		// Creation de l'arbre
 		ArrayList<Noeud> arbre = new ArrayList<Noeud>();
 		Noeud un = new Noeud();
 		un.valeur = 1;
@@ -22,15 +22,18 @@ public class Main {
 		un.y = 1;
 		un.ajouterDescendanceALArbre(xmax, arbre);
 		
-		//arbre en tableau
+		// Arbre en tableau
 		ArrayList<Noeud>[][] tableau = mettreArbreDansTableau(arbre, xmax);
 		
-		//affichage
+		// Affichage
 		afficherTableau(tableau);
 		separation();
-		afficherOblicites(tableau);
+		//afficherOblicites(tableau);
+		
+		// Vérifier si les noeuds vérifient une relation d'ordre donnée
+		verifierOrdre(arbre);
 	}
-	
+
 	public static ArrayList<Noeud>[][] mettreArbreDansTableau(ArrayList<Noeud> arbre, int xmax){
 		@SuppressWarnings("unchecked")
 		ArrayList<Noeud>[][] tab = new ArrayList[xmax][xmax];
@@ -55,13 +58,13 @@ public class Main {
 			for(int i=0; i<xmax; i++){
 				String cell = "{";
 				for(Noeud n : tab[i][j]){
-					if(AFFICHER_FANTOMES || !n.fantome){
+					//if(AFFICHER_FANTOMES || !n.fantome){
 						int oblicite = n.oblicite();
 						if(cell.length()>1){
 							cell=cell+",";
 						}
 						cell = cell+oblicite;
-					}
+					//}
 				}
 				cell = cell + "}";
 				ligne = ligne + cell;
@@ -84,15 +87,15 @@ public class Main {
 			while(i<xmax){
 				cell = "{";
 				for(Noeud n : tab[i][j]){
-					if(AFFICHER_FANTOMES || !n.fantome){
+					//if(AFFICHER_FANTOMES || !n.fantome){
 						if(!N_AFFICHER_QUE_LES_BRANCHES_AINEES || n.premiereBrancheDeLaBrancheParente){
 							if(cell.length()>1){
 								cell=cell+",";
 							}
 							
-							if(AFFICHER_FANTOMITUDE){
+							/*if(AFFICHER_FANTOMITUDE){
 								cell = cell+(n.fantome?"F":"R");
-							}
+							}*/
 							String zeros = "";
 							for(int k=(""+n.valeur).length(); k<tailleChiffres; k++){
 								zeros += "0";
@@ -103,7 +106,7 @@ public class Main {
 							}
 							
 						}
-					}
+					//}
 				}
 				cell = cell + "}";
 				tabStr[i][j] = cell;
@@ -128,6 +131,19 @@ public class Main {
 			System.out.println();
 		}
 		
+	}
+	
+	
+	private static void verifierOrdre(ArrayList<Noeud> arbre) {
+		for(Noeud n : arbre){
+			if (n.comparer(n.filsDroit) > 0) {
+				System.out.println( n.valeur+" ("+n.getOrdre().get(0)+";"+n.getOrdre().get(1)+") > "+
+						n.filsDroit.valeur+" ("+n.filsDroit.getOrdre().get(0)+";"+n.filsDroit.getOrdre().get(1)+")" );
+			} else if(n.enfanteEnBas && n.filsBas!=null && n.valeur!=4 && n.comparer(n.filsBas) > 0 && n.filsBas.valeur%2==1){
+				System.out.println( n.valeur+" ("+n.getOrdre().get(0)+";"+n.getOrdre().get(1)+") > "+
+						n.filsBas.valeur+" ("+n.filsBas.getOrdre().get(0)+";"+n.filsBas.getOrdre().get(1)+")" );
+			}
+		}
 	}
 	
 }

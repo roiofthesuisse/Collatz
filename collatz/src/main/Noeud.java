@@ -6,7 +6,7 @@ public class Noeud {
 	int x;
 	int y;
 	long valeur;
-	boolean fantome;
+	//boolean fantome;
 	String valeurBinaire;
 	Noeud parentHaut;
 	Noeud parentGauche;
@@ -15,6 +15,7 @@ public class Noeud {
 	boolean enfanteEnBas;
 	boolean laBrancheADejaEnfante;
 	boolean premiereBrancheDeLaBrancheParente;
+	private ArrayList<Long> ordre;
 	
 	public ArrayList<Noeud> getFils(){
 		ArrayList<Noeud> fils = new ArrayList<Noeud>();
@@ -32,19 +33,20 @@ public class Noeud {
 		return parentHaut;
 	}
 	
-	public void ajouterDescendanceALArbre(int xmax, ArrayList<Noeud> arbre){
+	public void ajouterDescendanceALArbre(int xmax, ArrayList<Noeud> arbre){	
 		//ajouter le noeud
-		arbre.add(this);
 		if(this.dansLArbre(arbre)){
-			this.fantome = true;
+			return;
 		}
-		this.enfanteEnBas = (this.valeur-1)%3==0 && this.valeur>1;
+		arbre.add(this);
+		
+		this.enfanteEnBas = (this.valeur-1)%3==0 && this.valeur>4;
 		
 		//créer le fils droit
 		Noeud fd = new Noeud();
 		fd.parentGauche = this;
 		this.filsDroit = fd;
-		fd.fantome = this.fantome;
+		//fd.fantome = this.fantome;
 		if(this.enfanteEnBas){
 			fd.laBrancheADejaEnfante = true;
 		}
@@ -58,14 +60,14 @@ public class Noeud {
 		}
 		
 		//créer le fils bas
-		if(enfanteEnBas){
+		if(enfanteEnBas && this.parentHaut==null){
 			Noeud fb = new Noeud();
 			fb.parentHaut = this;
 			this.filsBas = fb;
-			fb.fantome=this.fantome;
+			/*fb.fantome=this.fantome;
 			if(this.parentHaut!=null){
 				fb.fantome = true;
-			}
+			}*/
 			if(!this.laBrancheADejaEnfante){
 				fb.premiereBrancheDeLaBrancheParente = true;
 			}
@@ -105,10 +107,56 @@ public class Noeud {
 			System.out.println("5 est dans l'arbre "+arbreString);
 		}*/
 		for(Noeud n : arbre){
-			if(!this.equals(n) && !n.fantome && this.valeur == n.valeur){
+			if(!this.equals(n) && /*!n.fantome &&*/ this.valeur == n.valeur){
 				return true;
 			}
 		}
 		return false;
 	}
+	
+	public ArrayList<Long> getOrdre(){
+		if(this.ordre==null){
+			this.ordre = new ArrayList<Long>();
+			int palier = -1;
+			int i = 0;
+			while( palier == -1 ){
+				if(Math.pow(2, i) == valeur) {
+					palier = i;
+				} else if (Math.pow(2, i+1) > valeur) {
+					palier = i;
+				}
+				i++;
+			}
+			//if(valeur==3){ System.out.println("le palier de "+valeur+" est "+Math.pow(2, palier));}
+			
+			long reste = valeur - (long) Math.pow(2, palier);
+			//if(valeur==3){ System.out.println("le reste de "+valeur+" est "+reste);}
+			long quartile;
+			if(reste == 0){
+				quartile = 0;
+			} else if( reste >= Math.pow(2, palier-1)){
+				quartile = 2;
+			} else {
+				quartile = 1;
+			}
+			//if(valeur==3){ System.out.println("le quartile de "+valeur+" est "+quartile);}
+			
+			this.ordre.add(palier+2*quartile);
+			this.ordre.add(-this.valeur);
+		}
+		return this.ordre;
+	}
+
+	public int comparer(Noeud noeud2) {
+		for(int i=0; i<getOrdre().size(); i++){
+			if (this.getOrdre().get(i) > noeud2.getOrdre().get(i)) {
+				return 1;
+			} else if(this.getOrdre().get(i) < noeud2.getOrdre().get(i)) {
+				return -1;
+			}
+		}
+		return 0;
+	}
+	
+	
 }
